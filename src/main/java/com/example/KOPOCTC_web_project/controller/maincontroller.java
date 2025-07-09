@@ -109,6 +109,7 @@ public class maincontroller {
     }
     @GetMapping("/text/{id}/edit")
     public String edit(@PathVariable Long id, Model model) {
+
         Article saved = articleRepository.findById(id).orElse(null);
 
         model.addAttribute("article", saved);

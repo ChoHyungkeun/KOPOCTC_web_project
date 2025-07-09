@@ -16,7 +16,15 @@
         <hr class="border-warning">
         <p class="text-muted fs-6">작성자 : {{writer}}</p>
 
-        <p style="min-height: 150px;">내용 : {{content}}</p>
+        <p style="min-height: 150px;">
+            {{#hasImage}}
+                <img src="/images/{{imagePath}}" width="120" alt="이미지"><br>
+            {{/hasImage}}
+            {{content}}
+            </p>
+
+
+
 
 
         <hr>

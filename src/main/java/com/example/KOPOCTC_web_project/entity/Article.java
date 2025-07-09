@@ -38,6 +38,9 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    public boolean isHasImage() {
+        return imagePath != null && !imagePath.equals("no.jpg");
+    }
     public void patch(Article article) {
         //article.title null이 아니면 this.title 받음
         if(article.title !=null){
