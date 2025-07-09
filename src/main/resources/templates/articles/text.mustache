@@ -1,0 +1,30 @@
+{{>layouts/header}}
+<div class="container mt-4">
+
+    <!-- 구역마다 hr 사용 -->
+    <!--<h5>&lt;ID&gt;</h5>
+    <hr class="border-warning">
+    <p></p>
+
+    <h5>&lt;TITLE&gt;</h5>
+-->
+    {{#article}}
+        <hr class="border-warning">
+        <p>{{title}}</p>
+        <small class="text-muted ms-2">작성일 : {{createdAt}}</small>
+
+        <hr class="border-warning">
+        <p class="text-muted fs-6">작성자 : {{writer}}</p>
+
+        <p style="min-height: 150px;">내용 : {{content}}</p>
+
+
+        <hr>
+        <a href="/text/{{id}}/edit" class="btn btn-primary">수정하기</a>
+        <a href="/text/{{id}}/delete" class="btn btn-danger">삭제하기</a>
+        <a href="/text/list" class="btn btn-secondary">목록</a>
+    {{/article}}
+</div>
+{{>comments/_comments}}
+
+{{>layouts/footer}}

@@ -1,0 +1,34 @@
+{{>layouts/header}}
+<table class="table table-dark table-striped">
+    <thead>
+    <tr>
+        <th scope="col">글번호</th>
+        <th scope="col">제목</th>
+        <th scope="col">작성자</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#articles}}
+        <tr>
+            <td>{{id}}</td>
+            <td>
+                <a href="/text/{{id}}" class="text-info text-decoration-none">{{title}}</a>
+            </td>
+            <td>{{writer}}</td>
+        </tr>
+    {{/articles}}
+    </tbody>
+</table>
+<div style="text-align: center; margin-top: 20px;">
+    {{#pageNumbers}}
+        {{#isCurrentPage}}
+            <span style="font-weight: bold; margin: 0 5px;">{{number}}</span>
+        {{/isCurrentPage}}
+        {{^isCurrentPage}}
+            <a href="/drink/list?page={{numberMinusOne}}" style="margin: 0 5px;">{{number}}</a>
+        {{/isCurrentPage}}
+    {{/pageNumbers}}
+</div>
+<a href="/newtext" class="btn btn-primary mt-3">작성하기</a>
+
+{{>layouts/footer}}

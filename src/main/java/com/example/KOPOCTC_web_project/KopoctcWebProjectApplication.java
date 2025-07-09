@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class KopoctcWebProjectApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(KopoctcWebProjectApplication.class, args);
 	}
 
