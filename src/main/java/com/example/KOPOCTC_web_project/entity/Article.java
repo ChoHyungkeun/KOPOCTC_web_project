@@ -53,6 +53,7 @@ public class Article {
             log.info("this.content : " + this.content +", article.content= " + article.content);
             this.content = article.content;
         }
+
         this.imagePath = article.imagePath;
 
 

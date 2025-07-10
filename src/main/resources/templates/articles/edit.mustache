@@ -2,7 +2,7 @@
 <!-- 가독성 향상 -->
 
 <!-- con -->
-<form class="container" action="/drink/update" method="post" enctype="multipart/form-data">
+<form class="container" action="/text/update" method="post" enctype="multipart/form-data">
     <input type="hidden" name="id" value="{{article.id}}">
     <input type="hidden" name="originalImagePath" value="{{article.imagePath}}"> <!-- 기존 이미지 경로 유지 -->
 
@@ -30,7 +30,7 @@
 
     <button type="submit" class="btn btn-outline-secondary">수정 완료</button>
 
-    <a href="/drink/{{article.id}}">뒤로가기</a>
+    <a href="/text/{{article.id}}">뒤로가기</a>
 </form>
 
 {{>layouts/footer}}

@@ -68,7 +68,6 @@ public class maincontroller {
 
         return "articles/text";
     }
-
     @GetMapping("/newtext")
     public String newArticleform() {
 
@@ -103,7 +102,9 @@ public class maincontroller {
         }
 
         model.addAttribute("articles", pagedList);
-
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageNumbers", pageNumbers);
 
         return "articles/textlist";
     }
@@ -117,12 +118,11 @@ public class maincontroller {
         return "articles/edit";
     }
 
-    @PostMapping("/drink/update")
+    @PostMapping("/text/update")
     public String update(@RequestParam("id") Long id,
                          @RequestParam(value = "title", required = false) String title,
                          @RequestParam(value = "writer", required = false) String writer,
                          @RequestParam(value = "content", required = false) String content,
-                         @RequestParam(value = "rec", required = false) String rec,
                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                          @RequestParam(value = "originalImagePath", required = false) String originalImagePath) throws IOException {
 
@@ -135,7 +135,7 @@ public class maincontroller {
 
         // 2. 이미지 경로 처리
         String imagePath = (imageFile != null && !imageFile.isEmpty())
-                ? fileService.save(imageFile)
+                ? fileService.saveFile(imageFile)
                 : (originalImagePath != null ? originalImagePath : target.getImagePath());
 
         // 3. null이 아닌 항목만 업데이트
