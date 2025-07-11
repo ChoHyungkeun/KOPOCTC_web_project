@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,6 +66,9 @@ public class maincontroller {
 
     @GetMapping("/text/{number}")
     public String txtshow(@PathVariable Long number, Model model, HttpSession session) {
+        if (session.getAttribute("userKey") == null) {
+            session.setAttribute("userKey", session.getId()); // 세션 ID를 임시키로 사용
+        }
         Article saved = articleRepository.findById(number)
                 .orElseThrow(() -> new IllegalArgumentException("해당 글이 없습니다. id=" + number));
         List<CommentDto> commentDtos = commentService.comments(number);
@@ -241,7 +245,9 @@ public class maincontroller {
 
         // 즐겨찾기 저장
         Bookmark bookmark = new Bookmark();
-        bookmark.setUserKey(userKey);
+        bookmark.setArticle(article);  // 꼭 설정
+        bookmark.setUserKey(userKey);  // 꼭 설정
+        bookmarkRepository.save(bookmark);
 
 // 핵심 추가!
         article.addBookmark(bookmark);
@@ -255,11 +261,12 @@ public class maincontroller {
 
     // 즐겨찾기 해제
     @PostMapping("/text/{id}/unbookmark")
+    @Transactional
     public String unbookmark(@PathVariable Long id,
                              HttpSession session,
                              RedirectAttributes rattr) {
 
-        String userKey = session.getId(); // 나중에: (String) session.getAttribute("userId");
+        String userKey = (String) session.getAttribute("userKey");
 
         // 즐겨찾기 삭제
         bookmarkRepository.deleteByArticleIdAndUserKey(id, userKey);

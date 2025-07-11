@@ -31,7 +31,7 @@
             {{/hasbook}}
 
             {{#hasbook}} <!-- 즐겨찾기 한 경우 -->
-                <form action="/text/{{id}}/bookmark/delete" method="post" style="display: inline;">
+                <form action="/text/{{id}}/unbookmark" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-danger">즐겨찾기 취소</button>
                 </form>
             {{/hasbook}}
