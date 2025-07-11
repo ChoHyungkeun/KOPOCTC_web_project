@@ -1,6 +1,11 @@
 {{>layouts/header}}
 <div class="container mt-4">
-
+    {{#msg}}
+        <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+            {{msg}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {{/msg}}
     <!-- 구역마다 hr 사용 -->
     <!--<h5>&lt;ID&gt;</h5>
     <hr class="border-warning">
@@ -14,8 +19,16 @@
         <small class="text-muted ms-2">작성일 : {{createdAt}}</small>
 
         <hr class="border-warning">
-        <p class="text-muted fs-6">작성자 : {{writer}}</p>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <p class="text-muted fs-6 mb-0">작성자 : {{writer}}</p>
+        </div>
 
+        <div class="d-flex justify-content-end gap-2">
+            <form action="/text/{{id}}/bookmark" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-secondary">즐겨찾기</button>
+            </form>
+            <a href="/text/{{id}}/recommend" class="btn btn-secondary">추천하기</a>
+        </div>
         <p style="min-height: 150px;">
             {{#hasImage}}
                 <img src="/images/{{imagePath}}" width="120" alt="이미지"><br>
@@ -23,6 +36,9 @@
             {{content}}
             </p>
 
+    {{#recommendCount}}
+        <p> 추천 : {{recommendCount}}</p>
+    {{/recommendCount}}
 
 
 
@@ -31,6 +47,7 @@
         <a href="/text/{{id}}/edit" class="btn btn-primary">수정하기</a>
         <a href="/text/{{id}}/delete" class="btn btn-danger">삭제하기</a>
         <a href="/text/list" class="btn btn-secondary">목록</a>
+
     {{/article}}
 </div>
 {{>comments/_comments}}

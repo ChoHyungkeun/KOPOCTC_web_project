@@ -29,8 +29,12 @@ public class Article {
     @Column
     private String content;
 
+    @Column(nullable = false)
+    private Long recommendCount = 0L;  // ⭐ 기본값 설정!
+
     @Column(name = "image_path")
     private String imagePath; // 🔸 실제 저장된 이미지 경로
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -55,6 +59,12 @@ public class Article {
         }
 
         this.imagePath = article.imagePath;
+        if(article.recommendCount != null){
+            log.info("this.recommendCount : " + this.recommendCount +", article.recommend_count= " + article.recommendCount);
+            this.recommendCount = article.recommendCount;
+        }
+
+
 
 
     }
