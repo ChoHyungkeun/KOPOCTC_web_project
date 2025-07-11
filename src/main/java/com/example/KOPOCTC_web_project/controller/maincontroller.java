@@ -3,11 +3,15 @@ package com.example.KOPOCTC_web_project.controller;
 import com.example.KOPOCTC_web_project.dto.ArticleForm;
 import com.example.KOPOCTC_web_project.dto.CommentDto;
 import com.example.KOPOCTC_web_project.entity.Article;
+import com.example.KOPOCTC_web_project.entity.Bookmark;
 import com.example.KOPOCTC_web_project.repository.ArticleRepository;
+import com.example.KOPOCTC_web_project.repository.BookmarkRepository;
 import com.example.KOPOCTC_web_project.service.CommentService;
 import com.example.KOPOCTC_web_project.service.FileService;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +32,8 @@ public class maincontroller {
     private CommentService commentService;
     @Autowired
     private ArticleRepository articleRepository;
+    @Autowired
+    private BookmarkRepository bookmarkRepository;
     @Autowired
     private FileService fileService;
 
@@ -58,22 +64,32 @@ public class maincontroller {
     }
 
     @GetMapping("/text/{number}")
-    public String txtshow(@PathVariable Long number, Model model) {
+    public String txtshow(@PathVariable Long number, Model model, HttpSession session) {
         Article saved = articleRepository.findById(number)
                 .orElseThrow(() -> new IllegalArgumentException("해당 글이 없습니다. id=" + number));
         List<CommentDto> commentDtos = commentService.comments(number);
+        // 3. 북마크 여부 확인
+        String userKey = (String) session.getAttribute("userKey");
+        boolean hasBook = false;
+
+        if (userKey != null) {
+            Optional<Bookmark> bookmarkOpt = bookmarkRepository.findByArticleAndUserKey(saved, userKey);
+            hasBook = bookmarkOpt.isPresent();
+        }
 
         model.addAttribute("article", saved);
         model.addAttribute("commentDtos", commentDtos);
+        model.addAttribute("hasbook", hasBook);  // 추가된 부분
 
         return "articles/text";
     }
-
     @GetMapping("/newtext")
     public String newArticleform() {
 
         return "articles/newtext";
     }
+    //새글 컨트롤러
+
     @GetMapping("/text/list")
 
     public String text(Model model,
@@ -103,10 +119,14 @@ public class maincontroller {
         }
 
         model.addAttribute("articles", pagedList);
-
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageNumbers", pageNumbers);
 
         return "articles/textlist";
     }
+    //글목록 컨트롤러
+
     @GetMapping("/text/{id}/edit")
     public String edit(@PathVariable Long id, Model model) {
 
@@ -116,13 +136,14 @@ public class maincontroller {
 
         return "articles/edit";
     }
+    //수정 컨트롤러
 
-    @PostMapping("/drink/update")
+
+    @PostMapping("/text/update")
     public String update(@RequestParam("id") Long id,
                          @RequestParam(value = "title", required = false) String title,
                          @RequestParam(value = "writer", required = false) String writer,
                          @RequestParam(value = "content", required = false) String content,
-                         @RequestParam(value = "rec", required = false) String rec,
                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                          @RequestParam(value = "originalImagePath", required = false) String originalImagePath) throws IOException {
 
@@ -135,7 +156,7 @@ public class maincontroller {
 
         // 2. 이미지 경로 처리
         String imagePath = (imageFile != null && !imageFile.isEmpty())
-                ? fileService.save(imageFile)
+                ? fileService.saveFile(imageFile)
                 : (originalImagePath != null ? originalImagePath : target.getImagePath());
 
         // 3. null이 아닌 항목만 업데이트
@@ -149,6 +170,9 @@ public class maincontroller {
 
         return "redirect:/text/" + id;
     }
+    //업데이트 컨트롤러
+
+
     @GetMapping("/text/{id}/delete")
     public String deleteArticle(@PathVariable Long id, RedirectAttributes rttr){
         Article saved = articleRepository.findById(id).orElse(null);
@@ -162,4 +186,85 @@ public class maincontroller {
         return "redirect:/text/list";
 
     }
+    //삭제 컨트롤러
+
+
+    @GetMapping("/text/{id}/recommend")
+    public String recommend(@PathVariable Long id, HttpSession session, RedirectAttributes rttr) {
+        // 이미 추천했는지 확인
+        Set<Long> recommended = (Set<Long>) session.getAttribute("recommended");
+        if (recommended == null) {
+            recommended = new HashSet<>();
+        }
+
+        if (recommended.contains(id)) {
+            rttr.addFlashAttribute("msg", "이미 추천하셨습니다.");
+            return "redirect:/text/" + id;
+        }
+
+        // 추천 수 증가
+        Article article = articleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 글이 없습니다. id=" + id));
+        Long count = article.getRecommendCount() != null ? article.getRecommendCount() : 0;
+        article.setRecommendCount(count + 1);
+        articleRepository.save(article);
+
+        // 세션에 추천 기록 추가
+        recommended.add(id);
+        session.setAttribute("recommended", recommended);
+
+        rttr.addFlashAttribute("msg", "추천 완료!");
+        return "redirect:/text/" + id;
+    }
+    //추천수 컨트롤러
+
+    @PostMapping("/text/{id}/bookmark")
+    public String bookmark(@PathVariable Long id,
+                           HttpSession session,
+                           RedirectAttributes rattr) {
+
+        String userKey = session.getId(); // 나중에: (String) session.getAttribute("userId");
+
+        // 게시글 존재 여부 확인
+        Article article = articleRepository.findById(id).orElse(null);
+        if (article == null) {
+            rattr.addFlashAttribute("msg", "해당 게시글이 존재하지 않습니다.");
+            return "redirect:/text/list";
+        }
+
+        // 이미 즐겨찾기 했는지 확인
+        Optional<Bookmark> existing = bookmarkRepository.findByArticleAndUserKey(article, userKey);
+        if (existing.isPresent()) {
+            rattr.addFlashAttribute("msg", "이미 즐겨찾기한 게시글입니다.");
+            return "redirect:/text/" + id;
+        }
+
+        // 즐겨찾기 저장
+        Bookmark bookmark = new Bookmark();
+        bookmark.setUserKey(userKey);
+
+// 핵심 추가!
+        article.addBookmark(bookmark);
+
+// 저장 (Cascade 설정이 없다면 아래 줄 유지)
+        bookmarkRepository.save(bookmark);
+
+        rattr.addFlashAttribute("msg", "즐겨찾기 완료!");
+        return "redirect:/text/" + id;
+    }
+
+    // 즐겨찾기 해제
+    @PostMapping("/text/{id}/unbookmark")
+    public String unbookmark(@PathVariable Long id,
+                             HttpSession session,
+                             RedirectAttributes rattr) {
+
+        String userKey = session.getId(); // 나중에: (String) session.getAttribute("userId");
+
+        // 즐겨찾기 삭제
+        bookmarkRepository.deleteByArticleIdAndUserKey(id, userKey);
+        rattr.addFlashAttribute("msg", "즐겨찾기 해제 완료!");
+        return "redirect:/text/" + id;
+    }
+
 }
