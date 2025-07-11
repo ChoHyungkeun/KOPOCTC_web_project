@@ -24,13 +24,14 @@ public class ArticleForm {
     private LocalDateTime createdAt;
     private String imagePath;
     private Long recommendCount;
+    private String bookmarks;
 
 
     public boolean isHasImage() {
         return imagePath != null && !imagePath.equals("no.jpg");
     }
     public Article toEntity(String imagePath) {
-        return new Article(id, title, writer, content,   recommendCount,  imagePath, createdAt,new ArrayList<>());
+        return new Article(id, title, writer, content,   recommendCount,  imagePath,   createdAt, new ArrayList<>(), new ArrayList<>());
     }
 
 

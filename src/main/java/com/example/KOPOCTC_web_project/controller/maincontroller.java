@@ -64,13 +64,22 @@ public class maincontroller {
     }
 
     @GetMapping("/text/{number}")
-    public String txtshow(@PathVariable Long number, Model model) {
+    public String txtshow(@PathVariable Long number, Model model, HttpSession session) {
         Article saved = articleRepository.findById(number)
                 .orElseThrow(() -> new IllegalArgumentException("해당 글이 없습니다. id=" + number));
         List<CommentDto> commentDtos = commentService.comments(number);
+        // 3. 북마크 여부 확인
+        String userKey = (String) session.getAttribute("userKey");
+        boolean hasBook = false;
+
+        if (userKey != null) {
+            Optional<Bookmark> bookmarkOpt = bookmarkRepository.findByArticleAndUserKey(saved, userKey);
+            hasBook = bookmarkOpt.isPresent();
+        }
 
         model.addAttribute("article", saved);
         model.addAttribute("commentDtos", commentDtos);
+        model.addAttribute("hasbook", hasBook);  // 추가된 부분
 
         return "articles/text";
     }
@@ -232,8 +241,12 @@ public class maincontroller {
 
         // 즐겨찾기 저장
         Bookmark bookmark = new Bookmark();
-        bookmark.setArticle(article);
         bookmark.setUserKey(userKey);
+
+// 핵심 추가!
+        article.addBookmark(bookmark);
+
+// 저장 (Cascade 설정이 없다면 아래 줄 유지)
         bookmarkRepository.save(bookmark);
 
         rattr.addFlashAttribute("msg", "즐겨찾기 완료!");

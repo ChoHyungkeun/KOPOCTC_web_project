@@ -24,9 +24,18 @@
         </div>
 
         <div class="d-flex justify-content-end gap-2">
-            <form action="/text/{{id}}/bookmark" method="post" style="display: inline;">
-                <button type="submit" class="btn btn-secondary">즐겨찾기</button>
-            </form>
+            {{^hasbook}} <!-- 즐겨찾기 안 한 경우 -->
+                <form action="/text/{{id}}/bookmark" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary">즐겨찾기</button>
+                </form>
+            {{/hasbook}}
+
+            {{#hasbook}} <!-- 즐겨찾기 한 경우 -->
+                <form action="/text/{{id}}/bookmark/delete" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">즐겨찾기 취소</button>
+                </form>
+            {{/hasbook}}
+
             <a href="/text/{{id}}/recommend" class="btn btn-secondary">추천하기</a>
         </div>
         <p style="min-height: 150px;">

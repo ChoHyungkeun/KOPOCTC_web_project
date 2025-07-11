@@ -16,9 +16,12 @@ import java.util.List;
 @Setter
 @Entity
 @Slf4j
+
 public class Article {
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
+
+
     private Long id;
     @Column
     private String title;
@@ -32,6 +35,8 @@ public class Article {
     @Column(nullable = false)
     private Long recommendCount = 0L;  // ⭐ 기본값 설정!
 
+
+
     @Column(name = "image_path")
     private String imagePath; // 🔸 실제 저장된 이미지 경로
 
@@ -41,6 +46,9 @@ public class Article {
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Bookmark> bookmarks = new ArrayList<>();
 
     public boolean isHasImage() {
         return imagePath != null && !imagePath.equals("no.jpg");
@@ -64,12 +72,25 @@ public class Article {
             this.recommendCount = article.recommendCount;
         }
 
+        if(article.bookmarks != null){
+            log.info("this.bookmarks : " + this.bookmarks +", article.bookmarks= " + article.bookmarks);
+            this.bookmarks= article.bookmarks;
+        }
+
 
 
 
     }
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void addBookmark(Bookmark bookmark) {
+        if (this.bookmarks == null) {
+            this.bookmarks = new ArrayList<>();
+        }
+        this.bookmarks.add(bookmark);
+        bookmark.setArticle(this); // 양방향 연결
     }
 
 
