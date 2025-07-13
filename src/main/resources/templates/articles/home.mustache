@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>메인 페이지</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header, footer {
+            flex-shrink: 0; /* 높이 고정 */
+        }
+
+        .main-content {
+            flex-grow: 1; /* 남은 공간 모두 차지 */
+            display: flex;
+            justify-content: center; /* 수평 가운데 */
+            align-items: center;    /* 수직 가운데 */
+            background-color: #f0f4f8; /* body 배경색 대신 여기 줘도 됨 */
+        }
+
+        /* 기존 container 스타일 유지 */
+        .container {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 360px;
+        }
+
+        /* 버튼 스타일 유지 */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
+            margin: 12px 0;
+            font-size: 1.1rem;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1.2;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn.login {
+            background-color: #ce9f30;
+        }
+
+        .btn.login:hover {
+            background-color: #ab7c16 ;
+        }
+
+        .btn.signup {
+            background-color: #28a745;
+        }
+
+        .btn.signup:hover {
+            background-color: #1e7e34;
+        }
+
+        .btn.use {
+            background-color: #17a2b8;
+        }
+
+        .btn.use:hover {
+            background-color: #117a8b;
+        }
+    </style>
+</head>
+<body>
+{{>layouts/header}}
+
+<main class="main-content">
+    <div class="container">
+        <h1>서울 공공데이터 조회</h1>
+        {{#isLoggedIn}}
+        <a href="/logout" class="btn login">로그아웃</a>
+        {{/isLoggedIn}}
+        {{^isLoggedIn}}
+        <a href="/login" class="btn login">로그인</a>
+        <a href="/join" class="btn signup">회원가입</a>
+        {{/isLoggedIn}}
+        <a href="/data" class="btn use">이용하기</a>
+    </div>
+</main>
+
+{{>layouts/footer}}
+</body>
+</html>

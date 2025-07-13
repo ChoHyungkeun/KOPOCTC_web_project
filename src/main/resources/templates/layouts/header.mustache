@@ -12,17 +12,17 @@
 </head>
 <body>
 <!-- header.html -->
-<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #005bac, #00a0e9);">
-    <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">공공서비스예약</a>
-        <div class="d-flex">
-            <a href="#" class="nav-link text-white">로그인</a>
-            <div class="nav-link text-white">KOR ▼</div>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, #005bac, #00a0e9); min-height: 56px; width: 100%;">
+    <div class="d-flex justify-content-between align-items-center w-100 px-3">
+        <a class="navbar-brand text-white mb-0" href="/">공공서비스예약</a>
+        <div class="d-flex align-items-center">
+            <a href="#" class="nav-link text-white px-3">로그인</a>
+            <div class="nav-link text-white px-3" style="cursor: pointer;">KOR ▼</div>
         </div>
     </div>
 </nav>
 
-<ul class="nav nav-tabs bg-light justify-content-center">
+<ul class="nav nav-tabs bg-light justify-content-center" style="margin-bottom: 0;">
     <li class="nav-item">
         <a class="nav-link active" href="#">체육시설</a>
     </li>
@@ -39,3 +39,30 @@
         <a class="nav-link" href="#">진료복지</a>
     </li>
 </ul>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    axios.interceptors.response.use(
+      response => response,
+      async error => {
+        if (error.response && error.response.status === 401) {
+          // 1. 클라이언트에 refreshToken 쿠키가 있는지 확인
+          const hasRefreshToken = document.cookie.includes("refreshToken=");
+          if (!hasRefreshToken) {
+            // 로그인 안된 상태 → 곧장 로그인 페이지로
+            window.location.href = '/login';
+            return Promise.reject(error);
+          }
+
+          // 2. refreshToken이 존재하면 → 재발급 시도
+          try {
+            await axios.post('/reissue', null, { withCredentials: true });
+            return axios(error.config); // 재요청
+          } catch (reissueError) {
+            // 재발급 실패 → 로그인 페이지로
+            window.location.href = '/login';
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+</script>
