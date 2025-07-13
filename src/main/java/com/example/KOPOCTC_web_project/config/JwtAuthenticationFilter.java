@@ -37,7 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.equals("/login") || requestURI.equals("/signin") ||
                 requestURI.equals("/signup") || requestURI.equals("/favicon.ico") ||
                 requestURI.startsWith("/css/") || requestURI.startsWith("/js/") ||
-                requestURI.startsWith("/images/") || requestURI.equals("/error")) {
+                requestURI.startsWith("/images/") || requestURI.equals("/error") ||
+                requestURI.startsWith("/h2-console")) {
             chain.doFilter(req, res);
             return;
         }

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>서비스 목록</title>
+    <style>
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding-left: 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination li a, .pagination li span {
+            display: block;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #333;
+        }
+        .pagination li span.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<h1>서비스 목록</h1>
+
+<form method="get" action="/services">
+    카테고리:
+    <select name="category">
+        <option value="" {{^searchCondition.category}}selected{{/searchCondition.category}}>전체</option>
+        {{#categoryOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/categoryOptions}}
+    </select>
+
+    지역:
+    <select name="area">
+        <option value="" {{^searchCondition.area}}selected{{/searchCondition.area}}>전체</option>
+        {{#areaOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/areaOptions}}
+    </select>
+
+    상태:
+    <select name="status">
+        <option value="" {{^searchCondition.status}}selected{{/searchCondition.status}}>전체</option>
+        {{#statusOptions}}
+            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/statusOptions}}
+    </select>
+
+    키워드:
+    <input type="text" name="keyword" value="{{searchCondition.keyword}}" />
+
+    정렬:
+    <select name="sortBy">
+        <option value="serviceName" {{#sortByServiceName}}selected{{/sortByServiceName}}>서비스명</option>
+        <option value="category" {{#sortByCategory}}selected{{/sortByCategory}}>카테고리</option>
+    </select>
+
+    방향:
+    <select name="sortDir">
+        <option value="ASC" {{#sortDirAsc}}selected{{/sortDirAsc}}>오름차순</option>
+        <option value="DESC" {{#sortDirDesc}}selected{{/sortDirDesc}}>내림차순</option>
+    </select>
+
+    페이지당 항목 수:
+    <select name="size">
+        <option value="10" {{#size10}}selected{{/size10}}>10</option>
+        <option value="20" {{#size20}}selected{{/size20}}>20</option>
+        <option value="50" {{#size50}}selected{{/size50}}>50</option>
+    </select>
+
+    <button type="submit">검색</button>
+</form>
+
+<table border="1" cellspacing="0" cellpadding="5" width="100%" style="margin-top:20px;">
+    <thead>
+    <tr>
+        <th>서비스명</th>
+        <th>카테고리</th>
+        <th>지역</th>
+        <th>상태</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#serviceList.content}}
+        <tr>
+            <td>{{serviceName}}</td>
+            <td>{{category}}</td>
+            <td>{{areaName}}</td>
+            <td>{{serviceStatus}}</td>
+        </tr>
+    {{/serviceList.content}}
+    {{^serviceList.content}}
+        <tr>
+            <td colspan="4">조회된 서비스가 없습니다.</td>
+        </tr>
+    {{/serviceList.content}}
+    </tbody>
+</table>
+
+<ul class="pagination">
+    {{#serviceList.hasPrevious}}
+        <li>
+            <a href="?page={{prevPage}}&size={{searchCondition.size}}&category={{searchCondition.category}}&area={{searchCondition.area}}&keyword={{searchCondition.keyword}}&status={{searchCondition.status}}&sortBy={{searchCondition.sortBy}}&sortDir={{searchCondition.sortDir}}">이전</a>
+        </li>
+    {{/serviceList.hasPrevious}}
+
+    {{#pageNumbers}}
+        <li>
+            {{#current}}
+                <span class="active">{{pagePlusOne}}</span>
+            {{/current}}
+            {{^current}}
+                <a href="?page={{page}}&size={{searchCondition.size}}&category={{searchCondition.category}}&area={{searchCondition.area}}&keyword={{searchCondition.keyword}}&status={{searchCondition.status}}&sortBy={{searchCondition.sortBy}}&sortDir={{searchCondition.sortDir}}">{{pagePlusOne}}</a>
+            {{/current}}
+        </li>
+    {{/pageNumbers}}
+
+    {{#serviceList.hasNext}}
+        <li>
+            <a href="?page={{nextPage}}&size={{searchCondition.size}}&category={{searchCondition.category}}&area={{searchCondition.area}}&keyword={{searchCondition.keyword}}&status={{searchCondition.status}}&sortBy={{searchCondition.sortBy}}&sortDir={{searchCondition.sortDir}}">다음</a>
+        </li>
+    {{/serviceList.hasNext}}
+</ul>
+
+</body>
+</html>
