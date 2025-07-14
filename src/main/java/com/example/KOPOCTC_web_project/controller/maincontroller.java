@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -38,6 +40,18 @@ public class maincontroller {
     @Autowired
     private FileService fileService;
 
+
+    @GetMapping("/")
+    public String home(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        boolean isLoggedIn = (userDetails != null);
+        System.out.println("userDetails = " + userDetails);
+        model.addAttribute("isLoggedIn", isLoggedIn);
+        if (isLoggedIn) {
+            model.addAttribute("username", userDetails.getUsername());
+        }
+
+        return "articles/home";
+    }
 
     @PostMapping("/article/create")
     public String create(@ModelAttribute ArticleForm form) throws IOException {
@@ -95,7 +109,6 @@ public class maincontroller {
     //새글 컨트롤러
 
     @GetMapping("/text/list")
-
     public String text(Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "10") int size) {
