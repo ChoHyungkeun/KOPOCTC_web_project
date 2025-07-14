@@ -1,4 +1,23 @@
 {{>layouts/header}}
+
+<div class="card mb-4">
+    <div class="card-body">
+        {{#service.imageUrl}}
+            <div class="text-center mb-3">
+                <img src="{{service.imageUrl}}" alt="이미지" class="img-fluid rounded" style="max-width: 400px;">
+            </div>
+        {{/service.imageUrl}}
+
+        <p><strong>위치 :</strong> {{service.areaName}}</p>
+        <p><strong>서비스명 :</strong> {{service.serviceName}}</p>
+        <p><strong>서비스대상 :</strong> {{service.useTarget}}</p>
+        <p><strong>접수기간 :</strong> {{service.reservationStartDate}} ~ {{service.reservationEndDate}}</p>
+        <p><strong>서비스상태 :</strong> {{service.serviceStatus}}</p>
+        <p><strong>서비스종류 :</strong> {{service.category}}</p>
+        <p><strong>예약 링크 :</strong> <a href="{{service.serviceUrl}}" class="text-primary">예약서비스 이동</a></p>
+        <p><strong>문의전화 :</strong> {{service.telNo}}</p>
+    </div>
+</div>
 <table class="table table-dark table-striped">
     <thead>
     <tr>
@@ -30,5 +49,6 @@
     {{/pageNumbers}}
 </div>
 <a href="/newtext" class="btn btn-primary mt-3">작성하기</a>
+
 
 {{>layouts/footer}}
