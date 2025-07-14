@@ -7,15 +7,17 @@ import com.example.KOPOCTC_web_project.service.SeoulPublicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.web.util.HtmlUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -80,9 +82,25 @@ public class SeoulServiceController {
         searchCondition.setSize(size);
         searchCondition.setSortBy(sortBy);
         searchCondition.setSortDir(sortDir);
+        Map<String, Object> searchConditionMap = new HashMap<>();
+        searchConditionMap.put("category", Optional.ofNullable(searchCondition.getCategory()).orElse(""));
+        searchConditionMap.put("area", Optional.ofNullable(searchCondition.getArea()).orElse(""));
+        searchConditionMap.put("keyword", Optional.ofNullable(searchCondition.getKeyword()).orElse(""));
+        searchConditionMap.put("status", Optional.ofNullable(searchCondition.getStatus()).orElse(""));
+        searchConditionMap.put("page", searchCondition.getPage());
+        searchConditionMap.put("size", searchCondition.getSize());
+        searchConditionMap.put("sortBy", searchCondition.getSortBy());
+        searchConditionMap.put("sortDir", searchCondition.getSortDir());
+
+        model.addAttribute("searchCondition", searchConditionMap);
 
         // 서비스 목록 조회
         PageResultDto<ServiceSummaryDto> serviceList = service.getServiceList(searchCondition);
+        serviceList.getContent().forEach(dto -> {
+            if (dto.getServiceName() != null) {
+                dto.setServiceName(HtmlUtils.htmlUnescape(dto.getServiceName()));
+            }
+        });
         System.out.println("searchCondition = " + searchCondition);
 
         // 필터 옵션 리스트
@@ -96,13 +114,33 @@ public class SeoulServiceController {
         List<SelectOptionDto> statusOptions = toSelectOptions(statuses, searchCondition.getStatus());
 
         // 페이징 번호 리스트 (현재 페이지 ± 2)
-        int totalPages = serviceList.getTotalPages();
-        int startPage = Math.max(0, page - 2);
-        int endPage = Math.min(totalPages - 1, page + 2);
+        int totalPages = serviceList.getTotalPages();  // 전체 페이지 수 (0-based)
+        int maxButtons = 5;  // 최대 보여줄 페이지 버튼 수
 
+        // 현재 페이지 (0-based)
+        int currentPage = page;
+
+        // 시작 페이지 번호 계산
+        int half = maxButtons / 2;
+        int startPage = currentPage - half;
+        int endPage = currentPage + half;
+
+        // 시작 페이지가 0보다 작으면 보정
+        if (startPage < 0) {
+            startPage = 0;
+            endPage = Math.min(maxButtons - 1, totalPages - 1);
+        }
+
+        // 끝 페이지가 전체 페이지 수보다 크면 보정
+        if (endPage > totalPages - 1) {
+            endPage = totalPages - 1;
+            startPage = Math.max(0, endPage - maxButtons + 1);
+        }
+
+        // 페이지 버튼 리스트 생성
         List<PageNumberDto> pageNumbers = new ArrayList<>();
         for (int i = startPage; i <= endPage; i++) {
-            pageNumbers.add(new PageNumberDto(i, i == page));
+            pageNumbers.add(new PageNumberDto(i, i == currentPage));
         }
 
         // 이전/다음 페이지 번호 계산
@@ -110,7 +148,8 @@ public class SeoulServiceController {
         int nextPage = (page < totalPages - 1) ? page + 1 : totalPages - 1;
 
         System.out.println("searchCondition == null? " + (searchCondition == null));
-
+        System.out.println("searchCondition class = " + searchCondition.getClass().getName());
+        System.out.println("searchCondition keyword = " + searchCondition.getKeyword());
         // 정렬 및 페이지 크기 관련 편의 변수
         model.addAttribute("sortByServiceName", "serviceName".equalsIgnoreCase(sortBy));
         model.addAttribute("sortByCategory", "category".equalsIgnoreCase(sortBy));
@@ -125,7 +164,7 @@ public class SeoulServiceController {
         model.addAttribute("categoryOptions", categoryOptions);
         model.addAttribute("areaOptions", areaOptions);
         model.addAttribute("statusOptions", statusOptions);
-        model.addAttribute("searchCondition", searchCondition);
+        //model.addAttribute("searchCondition", searchCondition);
         model.addAttribute("pageNumbers", pageNumbers);
         model.addAttribute("prevPage", prevPage);
         model.addAttribute("nextPage", nextPage);
@@ -142,6 +181,9 @@ public class SeoulServiceController {
         return options;
     }
 
+    @Value("${kakao.js.api.key}")
+    private String kakaoJsApiKey;
+
     // 서비스 상세 페이지
     @GetMapping("/service/{id}/{category}")
     public String serviceDetail(@PathVariable Long id, Model model, @PathVariable String category) {
@@ -150,32 +192,19 @@ public class SeoulServiceController {
         if (serviceDetail == null) {
             return "redirect:/services";
         }
+        serviceDetail.setServiceName(StringEscapeUtils.unescapeHtml4(serviceDetail.getServiceName()));
         model.addAttribute("service", serviceDetail);
+        model.addAttribute("kakaoJsApiKey", kakaoJsApiKey);
 
-        if ("체육시설".equals(category)) {
+        if ("체육시설".equals(category) || "문화시설".equals(category) || "교육".equals(category) || "진료".equals(category) || "시설대관".equals(category)) {
             List<Article> filteredArticles = articleRepository.findByCategory(category);
             model.addAttribute("articles", filteredArticles);
-            return "articles/servicedetail";
-        }
 
-        else if("문화시설".equals(category)) {
-            List<Article> filteredArticles = articleRepository.findByCategory(category);
-            model.addAttribute("articles", filteredArticles);
-            return "articles/servicedetail";
-        }
-        else if("교육".equals(category)) {
-            List<Article> filteredArticles = articleRepository.findByCategory(category);
-            model.addAttribute("articles", filteredArticles);
-            return "articles/servicedetail";
-        }
-        else if("진료".equals(category)) {
-            List<Article> filteredArticles = articleRepository.findByCategory(category);
-            model.addAttribute("articles", filteredArticles);
-            return "articles/servicedetail";
-        }
-        else if("시설대관".equals(category)) {
-            List<Article> filteredArticles = articleRepository.findByCategory(category);
-            model.addAttribute("articles", filteredArticles);
+            // 좌표값도 뷰에 전달 (x, y 좌표명은 dto 필드명에 맞춰 조정)
+            model.addAttribute("xCoordinate",
+                    serviceDetail.getXCoordinate() != null ? serviceDetail.getXCoordinate() : "127.121303");
+            model.addAttribute("yCoordinate",
+                    serviceDetail.getYCoordinate() != null ? serviceDetail.getYCoordinate() : "37.385941");
             return "articles/servicedetail";
         }
 

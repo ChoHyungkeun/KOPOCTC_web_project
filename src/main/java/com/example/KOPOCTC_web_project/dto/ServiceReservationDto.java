@@ -38,10 +38,10 @@ public class ServiceReservationDto {
     private String svcurl;          // 서비스 URL
 
     @JsonProperty("X")
-    private String x;               // X좌표
+    private Double x;               // X좌표
 
     @JsonProperty("Y")
-    private String y;               // Y좌표
+    private Double y;               // Y좌표
 
     @JsonProperty("SVCOPNBGNDT")
     private String svcopnbgndt;     // 서비스 개방 시작일

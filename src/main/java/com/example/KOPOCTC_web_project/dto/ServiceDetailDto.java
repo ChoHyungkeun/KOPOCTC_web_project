@@ -1,5 +1,6 @@
 package com.example.KOPOCTC_web_project.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,10 @@ public class ServiceDetailDto {
     private String reservationEndDate;
     private String imageUrl;
     private String detailContent;
-    private String xCoordinate;
-    private String yCoordinate;
+    @JsonProperty("x")
+    private Double xCoordinate;
+    @JsonProperty("y")
+    private Double yCoordinate;
 
     // Entity에서 DTO로 변환하는 생성자
     public ServiceDetailDto(com.example.KOPOCTC_web_project.entity.SeoulDataEntity entity) {

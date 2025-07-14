@@ -16,8 +16,38 @@
         <p><strong>서비스종류 :</strong> {{service.category}}</p>
         <p><strong>예약 링크 :</strong> <a href="{{service.serviceUrl}}" class="text-primary">예약서비스 이동</a></p>
         <p><strong>문의전화 :</strong> {{service.telNo}}</p>
+        <!-- 지도 영역 -->
+        <div id="map" style="width:100%;height:400px;margin-bottom:20px;"></div>
+        <!-- 카카오 지도 API 스크립트 -->
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{kakaoJsApiKey}}&autoload=false"></script>
+        <script>
+            // 카카오 지도 SDK가 로드된 후 실행될 함수
+            kakao.maps.load(function () {
+              var x = parseFloat("{{xCoordinate}}");
+    var y = parseFloat("{{yCoordinate}}");
+
+    var container = document.getElementById('map');
+
+    if (!isNaN(x) && !isNaN(y)) {
+      var options = {
+        center: new kakao.maps.LatLng(y, x),
+        level: 4
+      };
+      var map = new kakao.maps.Map(container, options);
+
+      var marker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(y, x)
+      });
+      marker.setMap(map);
+    } else {
+      // 좌표값이 없을 경우 기본 위치 및 안내 메시지
+      container.innerHTML = "<p style='text-align:center;'>좌표 정보가 없어 지도를 표시할 수 없습니다.</p>";
+    }
+  });
+        </script>
     </div>
 </div>
+
 <table class="table table-dark table-striped">
     <thead>
     <tr>

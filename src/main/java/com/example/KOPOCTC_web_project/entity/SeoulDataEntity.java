@@ -69,11 +69,11 @@ public class SeoulDataEntity {
     @Column(name = "detail_content", length = 1000)
     private String detailContent;
 
-    @Column(name = "x_coordinate")
-    private String xCoordinate;
+    @Column(name = "x")
+    private Double xCoordinate;
 
-    @Column(name = "y_coordinate")
-    private String yCoordinate;
+    @Column(name = "y")
+    private Double yCoordinate;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

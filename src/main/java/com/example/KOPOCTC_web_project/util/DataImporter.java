@@ -130,6 +130,8 @@ public class DataImporter {
         entity.setMaxClassTime(dto.getMaxclassnm());
         entity.setReservationStartDate(dto.getRcptbgndt());
         entity.setReservationEndDate(dto.getRcptenddt());
+        entity.setXCoordinate(dto.getX());
+        entity.setYCoordinate(dto.getY());
 
         return entity;
     }
