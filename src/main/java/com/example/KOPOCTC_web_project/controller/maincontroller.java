@@ -12,7 +12,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,12 +45,13 @@ public class maincontroller {
 
 
     @GetMapping("/")
-    public String home(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        boolean isLoggedIn = (userDetails != null);
-        System.out.println("userDetails = " + userDetails);
+    public String home(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isLoggedIn = (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken));
+        System.out.println("authentication = " + authentication);
         model.addAttribute("isLoggedIn", isLoggedIn);
         if (isLoggedIn) {
-            model.addAttribute("username", userDetails.getUsername());
+            model.addAttribute("username", authentication.getName());
         }
 
         return "articles/home";

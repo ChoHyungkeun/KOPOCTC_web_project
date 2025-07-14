@@ -55,7 +55,12 @@
     </select>
 
     키워드:
-    <input type="text" name="keyword" value="{{searchCondition.keyword}}" />
+    {{#searchCondition}}
+        <input type="text" name="keyword" value="{{keyword}}" />
+    {{/searchCondition}}
+    {{^searchCondition}}
+        <input type="text" name="keyword" value="" />
+    {{/searchCondition}}
 
     정렬:
     <select name="sortBy">

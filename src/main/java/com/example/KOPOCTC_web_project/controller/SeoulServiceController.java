@@ -105,6 +105,8 @@ public class SeoulServiceController {
         int prevPage = (page > 0) ? page - 1 : 0;
         int nextPage = (page < totalPages - 1) ? page + 1 : totalPages - 1;
 
+        System.out.println("searchCondition == null? " + (searchCondition == null));
+
         // 정렬 및 페이지 크기 관련 편의 변수
         model.addAttribute("sortByServiceName", "serviceName".equalsIgnoreCase(sortBy));
         model.addAttribute("sortByCategory", "category".equalsIgnoreCase(sortBy));

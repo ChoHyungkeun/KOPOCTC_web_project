@@ -30,8 +30,8 @@ public interface SeoulPublicServiceRepository extends JpaRepository<SeoulDataEnt
     // 복합 검색 (카테고리 + 지역 + 키워드)
     @Query("SELECT s FROM SeoulDataEntity s WHERE " +
             "(:category IS NULL OR s.category = :category) AND " +
-            "(:area IS NULL OR s.areaName LIKE %:area%) AND " +
-            "(:keyword IS NULL OR s.serviceName LIKE %:keyword% OR s.placeName LIKE %:keyword%) AND " +
+            "(:area IS NULL OR s.areaName LIKE :area) AND " +
+            "(:keyword IS NULL OR s.serviceName LIKE :keyword OR s.placeName LIKE :keyword) AND " +
             "(:status IS NULL OR s.serviceStatus = :status)")
     Page<SeoulDataEntity> findBySearchConditions(
             @Param("category") String category,

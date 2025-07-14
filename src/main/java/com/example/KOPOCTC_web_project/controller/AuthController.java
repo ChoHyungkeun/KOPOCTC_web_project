@@ -8,13 +8,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ public class AuthController {
             refreshCookie.setHttpOnly(true);
             refreshCookie.setPath("/");
             refreshCookie.setSecure(false);
-            refreshCookie.setMaxAge(2 * 60 * 60); // 2시간
+            refreshCookie.setMaxAge(3 * 60 * 60); // 3시간
             response.addCookie(refreshCookie);
 
             return "redirect:/";
@@ -58,5 +58,18 @@ public class AuthController {
 
         }
 
+    }
+
+    @GetMapping("/auth-check")
+    public ResponseEntity<?> check(@AuthenticationPrincipal UserDetails user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/access-denied")
+    public String accessDenied() {
+        return "articles/accessDenied";
     }
 }

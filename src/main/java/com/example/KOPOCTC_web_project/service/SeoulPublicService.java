@@ -33,10 +33,18 @@ public class SeoulPublicService {
         Pageable pageable = PageRequest.of(searchCondition.getPage(), searchCondition.getSize(), sort);
 
         // 검색 조건에 따른 데이터 조회
+        String keyword = searchCondition.getKeyword();
+        if (keyword != null && !keyword.isEmpty()) {
+            keyword = "%" + keyword + "%";
+        }
+        String area = searchCondition.getArea();
+        if (area != null && !area.isEmpty()) {
+            area = "%" + area + "%";
+        }
         Page<SeoulDataEntity> page = repository.findBySearchConditions(
                 searchCondition.getCategory(),
-                searchCondition.getArea(),
-                searchCondition.getKeyword(),
+                area,
+                keyword,
                 searchCondition.getStatus(),
                 pageable
         );
