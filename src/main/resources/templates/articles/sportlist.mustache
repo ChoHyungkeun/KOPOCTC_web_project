@@ -1,20 +1,21 @@
 {{>layouts/header}}
+
 <table class="table table-dark table-striped">
     <thead>
     <tr>
-        <th scope="col" style="width: 10%;">글번호</th>
-        <th scope="col" style="width: 70%;">제목</th>
-        <th scope="col" style="width: 20%;">작성자</th>
+        <th scope="col">글번호</th>
+        <th scope="col">제목</th>
+        <th scope="col">작성자</th>
     </tr>
     </thead>
     <tbody>
     {{#articles}}
         <tr>
-            <td style="width: 10%;">{{id}}</td>
-            <td style="width: 70%;">
+            <td>{{id}}</td>
+            <td>
                 <a href="/text/{{id}}" class="text-info text-decoration-none">{{title}}</a>
             </td>
-            <td style="width: 20%;">{{writer}}</td>
+            <td>{{writer}}</td>
         </tr>
     {{/articles}}
     </tbody>

@@ -37,12 +37,15 @@ public class Article {
 
 
 
+
     @Column(name = "image_path")
     private String imagePath; // 🔸 실제 저장된 이미지 경로
 
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private String category; // ← 반드시 필요!
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

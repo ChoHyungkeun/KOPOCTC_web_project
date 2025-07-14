@@ -1,9 +1,12 @@
 package com.example.KOPOCTC_web_project.controller;
 
 import com.example.KOPOCTC_web_project.dto.*;
+import com.example.KOPOCTC_web_project.entity.Article;
+import com.example.KOPOCTC_web_project.repository.ArticleRepository;
 import com.example.KOPOCTC_web_project.service.SeoulPublicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SeoulServiceController {
-
+    @Autowired
+    private ArticleRepository articleRepository;
     private final SeoulPublicService service;
 
     // 메인 페이지
@@ -139,18 +143,64 @@ public class SeoulServiceController {
     }
 
     // 서비스 상세 페이지
-    @GetMapping("/service/{id}")
-    public String serviceDetail(@PathVariable Long id, Model model) {
+    @GetMapping("/service/{id}/{category}")
+    public String serviceDetail(@PathVariable Long id, Model model, @PathVariable String category) {
         ServiceDetailDto serviceDetail = service.getServiceDetail(id);
 
         if (serviceDetail == null) {
             return "redirect:/services";
         }
-
         model.addAttribute("service", serviceDetail);
+
+        if ("체육시설".equals(category)) {
+            List<Article> filteredArticles = articleRepository.findByCategory(category);
+            model.addAttribute("articles", filteredArticles);
+            return "articles/servicedetail";
+        }
+
+        else if("문화시설".equals(category)) {
+            List<Article> filteredArticles = articleRepository.findByCategory(category);
+            model.addAttribute("articles", filteredArticles);
+            return "articles/servicedetail";
+        }
+        else if("교육".equals(category)) {
+            List<Article> filteredArticles = articleRepository.findByCategory(category);
+            model.addAttribute("articles", filteredArticles);
+            return "articles/servicedetail";
+        }
+        else if("진료".equals(category)) {
+            List<Article> filteredArticles = articleRepository.findByCategory(category);
+            model.addAttribute("articles", filteredArticles);
+            return "articles/servicedetail";
+        }
+        else if("시설대관".equals(category)) {
+            List<Article> filteredArticles = articleRepository.findByCategory(category);
+            model.addAttribute("articles", filteredArticles);
+            return "articles/servicedetail";
+        }
 
         return "detail";
     }
+
+    @GetMapping("/service/{category}")
+    public String listByCategoryOnly(@PathVariable String category, Model model) {
+        // id 없이 카테고리만으로 조회 시
+        // 전체 목록 조회 또는 카테고리별 필터링
+        if ("체육시설".equals(category)) {
+            return "articles/sportlist";
+        } else if ("문화시설".equals(category)) {
+            return "articles/culturelist";
+        } else if ("교육".equals(category)) {
+            return "articles/edulist";
+        } else if ("진료".equals(category)) {
+            return "articles/medlist";
+        } else if ("시설대관".equals(category)) {
+            return "articles/rentlist";
+        }
+
+        return "articles/all";
+    }
+
 
     // 카테고리별 서비스 목록 (AJAX 용)
     @GetMapping("/api/services/category/{category}")

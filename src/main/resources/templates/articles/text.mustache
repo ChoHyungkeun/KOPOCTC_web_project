@@ -14,7 +14,9 @@
     <h5>&lt;TITLE&gt;</h5>
 -->
     {{#article}}
+        <P>사용후기</P>
         <hr class="border-warning">
+        <p>시설유형 : {{category}}</p>
         <p>{{title}}</p>
         <small class="text-muted ms-2">작성일 : {{createdAt}}</small>
 
@@ -38,6 +40,8 @@
 
             <a href="/text/{{id}}/recommend" class="btn btn-secondary">추천하기</a>
         </div>
+        <hr class="border-warning">
+
         <p style="min-height: 150px;">
             {{#hasImage}}
                 <img src="/images/{{imagePath}}" width="120" alt="이미지"><br>
@@ -55,7 +59,7 @@
         <hr>
         <a href="/text/{{id}}/edit" class="btn btn-primary">수정하기</a>
         <a href="/text/{{id}}/delete" class="btn btn-danger">삭제하기</a>
-        <a href="/text/list" class="btn btn-secondary">목록</a>
+        <a href="/service/{{id}}/{{category}}" class="btn btn-secondary">뒤로가기</a>
 
     {{/article}}
 </div>

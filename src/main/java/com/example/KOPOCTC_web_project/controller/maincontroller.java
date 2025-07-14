@@ -74,6 +74,8 @@ public class maincontroller {
         article.setWriter(form.getWriter());
         article.setContent(form.getContent());
         article.setImagePath(fileName);
+        article.setCategory(form.getCategory()); // ✅ 추가
+
         if (article.getImagePath() == null || article.getImagePath().isBlank()) {
             article.setImagePath("no.jpg");
         }
@@ -112,12 +114,13 @@ public class maincontroller {
     }
     //새글 컨트롤러
 
-    @GetMapping("/text/list")
-    public String text(Model model,
+    @GetMapping("/text/list/{category}")
+    public String text(@PathVariable String category,
+            Model model,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "10") int size) {
 
-        List<Article> fullList = articleRepository.findAll(); // 전체 글 목록
+        List<Article> fullList = articleRepository.findByCategory(category);
         int start = page * size;
         int end = Math.min((start + size), fullList.size());
 
