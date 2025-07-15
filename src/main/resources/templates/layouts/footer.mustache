@@ -1,9 +1,57 @@
-<!-- footer -->
-<div class="mb-5 container-fluid">
-    <hr>
-    <p> Copyright kopo java web programming | <a href="#">Privacy </a> | <a href="#">Terms</a></p>
+<footer class="bg-dark text-white mt-5 pt-4 pb-3">
+    <style>
+        footer.bg-dark {
+          background-color: #212529 !important; /* Bootstrap bg-dark 기본색상 유지 */
+        }
+        footer p, footer a, footer div {
+          font-size: 0.875rem; /* small 크기 */
+          user-select: none;
+        }
+        footer .footer-link {
+          transition: color 0.3s ease;
+        }
+        footer .footer-link:hover {
+          color: #74c0fc !important;
+          text-decoration: underline;
+        }
+        footer hr.border-secondary {
+          border-color: #6c757d !important;
+          opacity: 0.3;
+        }
+        @media (max-width: 767.98px) {
+          footer .text-md-start {
+            text-align: center !important;
+          }
+          footer .text-md-end {
+            text-align: center !important;
+            margin-top: 0.5rem;
+          }
+        }
+    </style>
 
-</div>
+    <div class="container text-center text-md-start">
+        <div class="row align-items-center">
+            <!-- 왼쪽 저작권 문구 -->
+            <div class="col-md-6 mb-2 mb-md-0">
+                <p class="mb-0 small">
+                    &copy; 2025 서울시 공공서비스 예약 시스템. 서울시 공공데이터를 활용한 서비스입니다.
+                </p>
+            </div>
+
+            <!-- 오른쪽 링크 -->
+            <div class="col-md-6 text-center text-md-end">
+                <a href="#" class="text-white text-decoration-none me-3 small footer-link">Privacy</a>
+                <a href="#" class="text-white text-decoration-none small footer-link">Terms</a>
+            </div>
+        </div>
+
+        <hr class="border-secondary my-3">
+
+        <div class="text-center small">
+            Copyright kopo java web programming
+        </div>
+    </div>
+</footer>
 
 </body>
 </html>

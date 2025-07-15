@@ -1,84 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>서비스 상세</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/xxxxxxxx.js" crossorigin="anonymous"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        footer .container {
+            background: transparent !important;
+            border-radius: 0 !important;
+        }
+    </style>
+</head>
+<body>
+
 {{>layouts/header}}
 
-<div class="card mb-4">
-    <div class="card-body">
-        {{#service.imageUrl}}
-            <div class="text-center mb-3">
-                <img src="{{service.imageUrl}}" alt="이미지" class="img-fluid rounded" style="max-width: 400px;">
+<main>
+    <div class="container mt-4">
+        <!-- 서비스 카드 -->
+        <div class="card mb-4 shadow">
+            <div class="row g-0">
+                {{#service.imageUrl}}
+                    <div class="col-md-5 text-center">
+                        <img src="{{service.imageUrl}}" alt="이미지" class="img-fluid rounded-start" style="max-height: 100%; object-fit: cover;">
+                    </div>
+                {{/service.imageUrl}}
+                <div class="col-md-7">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3 text-primary">
+                            <i class="fas fa-info-circle"></i> {{service.serviceName}}
+                        </h4>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><strong>📍 위치:</strong> {{service.areaName}}</li>
+                            <li class="list-group-item"><strong>🎯 대상:</strong> {{service.useTarget}}</li>
+                            <li class="list-group-item"><strong>🗓 접수기간:</strong> {{service.reservationStartDate}} ~ {{service.reservationEndDate}}</li>
+                            <li class="list-group-item"><strong>📌 상태:</strong> <span class="badge bg-info text-dark">{{service.serviceStatus}}</span></li>
+                            <li class="list-group-item"><strong>📂 카테고리:</strong> {{service.category}}</li>
+                            <li class="list-group-item">
+                                <strong>🔗 예약링크:</strong>
+                                <a href="{{service.serviceUrl}}" target="_blank" class="btn btn-sm btn-outline-primary">예약 이동</a>
+                            </li>
+                            <li class="list-group-item"><strong>📞 문의전화:</strong> {{service.telNo}}</li>
+                        </ul>
+                        <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{kakaoJsApiKey}}&autoload=false"></script>
+                        <script>
+                            kakao.maps.load(function () {
+                                var x = parseFloat("{{xCoordinate}}");
+                                var y = parseFloat("{{yCoordinate}}");
+                                var container = document.getElementById('map');
+                                if (!isNaN(x) && !isNaN(y)) {
+                                    var map = new kakao.maps.Map(container, {
+                                        center: new kakao.maps.LatLng(y, x),
+                                        level: 4
+                                    });
+                                    var marker = new kakao.maps.Marker({
+                                        position: new kakao.maps.LatLng(y, x)
+                                    });
+                                    marker.setMap(map);
+                                } else {
+                                    container.innerHTML = "<p class='text-center p-3'>좌표 정보가 없어 지도를 표시할 수 없습니다.</p>";
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
             </div>
-        {{/service.imageUrl}}
+        </div>
 
-        <p><strong>위치 :</strong> {{service.areaName}}</p>
-        <p><strong>서비스명 :</strong> {{service.serviceName}}</p>
-        <p><strong>서비스대상 :</strong> {{service.useTarget}}</p>
-        <p><strong>접수기간 :</strong> {{service.reservationStartDate}} ~ {{service.reservationEndDate}}</p>
-        <p><strong>서비스상태 :</strong> {{service.serviceStatus}}</p>
-        <p><strong>서비스종류 :</strong> {{service.category}}</p>
-        <p><strong>예약 링크 :</strong> <a href="{{service.serviceUrl}}" class="text-primary">예약서비스 이동</a></p>
-        <p><strong>문의전화 :</strong> {{service.telNo}}</p>
-        <!-- 지도 영역 -->
-        <div id="map" style="width:100%;height:400px;margin-bottom:20px;"></div>
-        <!-- 카카오 지도 API 스크립트 -->
-        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{kakaoJsApiKey}}&autoload=false"></script>
-        <script>
-            // 카카오 지도 SDK가 로드된 후 실행될 함수
-            kakao.maps.load(function () {
-              var x = parseFloat("{{xCoordinate}}");
-    var y = parseFloat("{{yCoordinate}}");
+        <!-- 지도 -->
+        <div class="card mb-4 shadow">
+            <div class="card-header bg-light"><strong><i class="fas fa-map-marked-alt"></i> 지도</strong></div>
+            <div class="card-body p-0">
+                <div id="map" style="width:100%; height:400px;"></div>
+            </div>
+        </div>
 
-    var container = document.getElementById('map');
+        <!-- 후기 목록 -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white"><i class="fas fa-comments"></i> 관련 후기</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 10%;">글번호</th>
+                        <th style="width: 70%;">제목</th>
+                        <th style="width: 20%;">작성자</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#articles}}
+                        <tr>
+                            <td>{{id}}</td>
+                            <td><a href="/text/{{id}}" class="text-decoration-none">{{title}}</a></td>
+                            <td>{{writer}}</td>
+                        </tr>
+                    {{/articles}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    if (!isNaN(x) && !isNaN(y)) {
-      var options = {
-        center: new kakao.maps.LatLng(y, x),
-        level: 4
-      };
-      var map = new kakao.maps.Map(container, options);
+        <!-- 페이지네이션 -->
+        <div class="text-center my-3">
+            {{#pageNumbers}}
+                {{#isCurrentPage}}
+                    <span class="fw-bold text-primary mx-2">{{number}}</span>
+                {{/isCurrentPage}}
+                {{^isCurrentPage}}
+                    <a href="/drink/list?page={{numberMinusOne}}" class="mx-2">{{number}}</a>
+                {{/isCurrentPage}}
+            {{/pageNumbers}}
+        </div>
 
-      var marker = new kakao.maps.Marker({
-        position: new kakao.maps.LatLng(y, x)
-      });
-      marker.setMap(map);
-    } else {
-      // 좌표값이 없을 경우 기본 위치 및 안내 메시지
-      container.innerHTML = "<p style='text-align:center;'>좌표 정보가 없어 지도를 표시할 수 없습니다.</p>";
-    }
-  });
-        </script>
+        <div class="text-end mb-5">
+            <a href="/newtext" class="btn btn-primary"><i class="fas fa-edit"></i> 작성하기</a>
+        </div>
     </div>
-</div>
-
-<table class="table table-dark table-striped">
-    <thead>
-    <tr>
-        <th scope="col" style="width: 10%;">글번호</th>
-        <th scope="col" style="width: 70%;">제목</th>
-        <th scope="col" style="width: 20%;">작성자</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{#articles}}
-        <tr>
-            <td style="width: 10%;">{{id}}</td>
-            <td style="width: 70%;">
-                <a href="/text/{{id}}" class="text-info text-decoration-none">{{title}}</a>
-            </td>
-            <td style="width: 20%;">{{writer}}</td>
-        </tr>
-    {{/articles}}
-    </tbody>
-</table>
-<div style="text-align: center; margin-top: 20px;">
-    {{#pageNumbers}}
-        {{#isCurrentPage}}
-            <span style="font-weight: bold; margin: 0 5px;">{{number}}</span>
-        {{/isCurrentPage}}
-        {{^isCurrentPage}}
-            <a href="/drink/list?page={{numberMinusOne}}" style="margin: 0 5px;">{{number}}</a>
-        {{/isCurrentPage}}
-    {{/pageNumbers}}
-</div>
-<a href="/newtext" class="btn btn-primary mt-3">작성하기</a>
-
+</main>
 
 {{>layouts/footer}}
+
+</body>
+</html>

@@ -132,6 +132,7 @@ public class DataImporter {
         entity.setReservationEndDate(dto.getRcptenddt());
         entity.setXCoordinate(dto.getX());
         entity.setYCoordinate(dto.getY());
+        entity.setImageUrl(dto.getImgurl());
 
         return entity;
     }

@@ -165,13 +165,15 @@
     document.querySelectorAll('.service-status').forEach(el => {
   const text = el.textContent.trim();
   if(text === '접수중') {
-    el.classList.add('bg-success', 'text-white');
+    el.classList.add('bg-primary', 'text-white');
     } else if(text === '예약마감') {
         el.classList.add('bg-danger', 'text-white');
-    } else if(text === '예약가능') {
+    } else if(text === '안내중') {
         el.classList.add('bg-info', 'text-dark');
+    } else if(text === '접수종료') {
+        el.classList.add('bg-secondary', 'text-dark');
     } else {
-        el.classList.add('bg-secondary', 'text-white');
+        el.classList.add('bg-dark', 'text-white');
     }
     });
 

@@ -38,11 +38,7 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="/"><i class="fas fa-calendar-check"></i> 서울시 공공서비스 예약</a>
-    </div>
-</nav>
+{{>layouts/header}}
 
 <div class="container mt-4">
     <!-- 통계 정보
@@ -171,7 +167,7 @@
             <div class="row">
                 {{#popularServices}}
                     <div class="col-md-4 mb-3">
-                        <div class="card service-card">
+                        <div class="card service-card h-100 position-relative" onclick="location.href='/service/{{id}}/{{category}}'" style="cursor: pointer;">
                             {{#imageUrl}}
                                 <img src="{{imageUrl}}" class="card-img-top" alt="{{serviceName}}" style="height: 200px; object-fit: cover;">
                             {{/imageUrl}}
@@ -188,14 +184,13 @@
                                     </small>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="category-badge">{{category}}</span>
-                                    <span class="badge bg-{{#lambda}}{{#serviceStatus}}접수중{{/serviceStatus}}success{{#serviceStatus}}마감{{/serviceStatus}}danger{{#serviceStatus}}예약가능{{/serviceStatus}}info{{/lambda}}">
+                                    <span class="category-badge bg-{{getCategoryClass}}">
+                                        {{category}}
+                                    </span>
+                                    <span class="badge bg-{{badgeClass}}">
                                         {{serviceStatus}}
                                     </span>
                                 </div>
-                                <a href="/service/{{id}}/{{category}}" class="btn btn-primary btn-sm mt-2">
-                                    <i class="fas fa-info-circle"></i> 리뷰보기
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -216,7 +211,7 @@
             <div class="row">
                 {{#recentServices}}
                     <div class="col-md-4 mb-3">
-                        <div class="card service-card">
+                        <div class="card service-card h-100 position-relative" onclick="location.href='/service/{{id}}/{{category}}'" style="cursor: pointer;">
                             {{#imageUrl}}
                                 <img src="{{imageUrl}}" class="card-img-top" alt="{{serviceName}}" style="height: 200px; object-fit: cover;">
                             {{/imageUrl}}
@@ -233,14 +228,13 @@
                                     </small>
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="category-badge">{{category}}</span>
-                                    <span class="badge bg-{{#lambda}}{{#serviceStatus}}접수중{{/serviceStatus}}success{{#serviceStatus}}마감{{/serviceStatus}}danger{{#serviceStatus}}예약가능{{/serviceStatus}}info{{/lambda}}">
+                                    <span class="category-badge bg-{{getCategoryClass}}">
+                                        {{category}}
+                                    </span>
+                                    <span class="badge bg-{{badgeClass}}">
                                         {{serviceStatus}}
                                     </span>
                                 </div>
-                                <a href="/service/{{id}}/{{category}}" class="btn btn-primary btn-sm mt-2">
-                                    <i class="fas fa-info-circle"></i> 리뷰보기
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -249,13 +243,6 @@
         </div>
     </div>
 </div>
-
-<footer class="bg-dark text-white text-center py-3 mt-5">
-    <div class="container">
-        <p>&copy; 2024 서울시 공공서비스 예약 시스템. 서울시 공공데이터를 활용한 서비스입니다.</p>
-    </div>
-</footer>
-
 <script src="/js/token-helper.js"></script>
 <script>
     // 페이지 로딩 시 토큰 만료 여부를 확인하고 필요시 재발급
@@ -300,5 +287,6 @@
     }
 });
 </script>
+{{>layouts/footer}}
 </body>
 </html>

@@ -51,7 +51,8 @@ public class AuthController {
             refreshCookie.setMaxAge(3 * 60 * 60); // 3시간
             response.addCookie(refreshCookie);
 
-            return "redirect:/";
+            return "redirect:/svclist"; //그냥 바로 진입
+            //return "redirect:/";
         } catch (Exception e) {
             e.printStackTrace();
             return "redirect:/login?error=true";

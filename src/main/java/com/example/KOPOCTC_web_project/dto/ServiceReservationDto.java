@@ -78,4 +78,22 @@ public class ServiceReservationDto {
 
     @JsonProperty("ADRES")
     private String adres;           // 주소
+
+    // 날짜 포맷: 2025-07-31
+    public String getRcptbgndt() {
+        return formatDate(rcptbgndt);
+    }
+
+    public String getRcptenddt() {
+        return formatDate(rcptenddt);
+    }
+
+    private String formatDate(String input) {
+        if (input == null || input.isBlank()) return "";
+        try {
+            return input.substring(0, 19); // "2025-07-31 00:00:00.0" → "2025-07-31"
+        } catch (Exception e) {
+            return input; // 실패 시 원본 반환
+        }
+    }
 }
