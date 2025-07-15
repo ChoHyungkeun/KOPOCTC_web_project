@@ -33,6 +33,7 @@ public class ServiceDetailDto {
     private Double xCoordinate;
     @JsonProperty("y")
     private Double yCoordinate;
+    private int recommendCount;
 
     // Entity에서 DTO로 변환하는 생성자
     public ServiceDetailDto(com.example.KOPOCTC_web_project.entity.SeoulDataEntity entity) {
@@ -57,5 +58,20 @@ public class ServiceDetailDto {
         this.detailContent = entity.getDetailContent();
         this.xCoordinate = entity.getXCoordinate();
         this.yCoordinate = entity.getYCoordinate();
+        this.recommendCount = entity.getRecommendCount();
+    }
+
+    public String getBadgeClass() {
+        if ("접수중".equals(serviceStatus)) {
+            return "primary";
+        } else if ("예약마감".equals(serviceStatus)) {
+            return "danger";
+        } else if ("안내중".equals(serviceStatus)) {
+            return "info";
+        } else if ("접수종료".equals(serviceStatus)) {
+            return "secondary";
+        } else {
+            return "dark";  // 기본 색상
+        }
     }
 }

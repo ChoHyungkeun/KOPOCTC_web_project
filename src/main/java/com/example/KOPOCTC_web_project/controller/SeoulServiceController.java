@@ -3,20 +3,26 @@ package com.example.KOPOCTC_web_project.controller;
 import com.example.KOPOCTC_web_project.dto.*;
 import com.example.KOPOCTC_web_project.entity.Article;
 import com.example.KOPOCTC_web_project.repository.ArticleRepository;
+import com.example.KOPOCTC_web_project.security.CustomUserDetails;
 import com.example.KOPOCTC_web_project.service.SeoulPublicService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.HtmlUtils;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Controller
@@ -101,7 +107,6 @@ public class SeoulServiceController {
                 dto.setServiceName(HtmlUtils.htmlUnescape(dto.getServiceName()));
             }
         });
-        System.out.println("searchCondition = " + searchCondition);
 
         // 필터 옵션 리스트
         List<String> categories = service.getCategories();
@@ -186,8 +191,14 @@ public class SeoulServiceController {
 
     // 서비스 상세 페이지
     @GetMapping("/service/{id}/{category}")
-    public String serviceDetail(@PathVariable Long id, Model model, @PathVariable String category) {
+    public String serviceDetail(@PathVariable Long id,
+                                @PathVariable String category,
+                                Model model,
+                                @ModelAttribute(value = "message", binding = false) String message,
+                                @ModelAttribute(value = "error", binding = false) String error) {
+        System.out.println("serviceDetail 호출됨, message=" + message + ", error=" + error);
         ServiceDetailDto serviceDetail = service.getServiceDetail(id);
+        System.out.println("recommendCount: " + serviceDetail.getRecommendCount());
 
         if (serviceDetail == null) {
             return "redirect:/services";
@@ -208,7 +219,7 @@ public class SeoulServiceController {
             return "articles/servicedetail";
         }
 
-        return "detail";
+        return "redirect:/services";
     }
 
     @GetMapping("/service/{category}")
@@ -270,6 +281,30 @@ public class SeoulServiceController {
 
         return service.searchServices(keyword, page, size);
     }
+
+    @PostMapping("/service/{id}/{category}/recommend")
+    @ResponseBody
+    public Map<String, Object> recommendAjax(
+            @PathVariable Long id,
+            @PathVariable String category,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Map<String, Object> result = new HashMap<>();
+        try {
+            int newCount = service.recommendService(id, userDetails.getUser());
+            result.put("success", true);
+            result.put("message", "추천 완료!");
+            result.put("newCount", newCount); // 새 추천수 응답
+        } catch (IllegalStateException e) {
+            result.put("success", false);
+            result.put("message", "이미 추천한 게시물입니다.");
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "추천 중 오류가 발생했습니다.");
+        }
+        return result;
+    }
+
 /*
     // 통계 정보 조회 (AJAX 용)
     @GetMapping("/api/statistics")

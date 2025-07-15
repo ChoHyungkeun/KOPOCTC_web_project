@@ -73,7 +73,7 @@ public interface SeoulPublicServiceRepository extends JpaRepository<SeoulDataEnt
 
     // 인기 서비스 조회 (예약 가능한 서비스 우선)
     @Query("SELECT s FROM SeoulDataEntity s " +
-            "WHERE s.serviceStatus IN ('접수중', '예약가능') " +
+            "WHERE s.serviceStatus IN ('접수중', '안내중') " +
             "ORDER BY s.serviceName")
     Page<SeoulDataEntity> findPopularServices(Pageable pageable);
 

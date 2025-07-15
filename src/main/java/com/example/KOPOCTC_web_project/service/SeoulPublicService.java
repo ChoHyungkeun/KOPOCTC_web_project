@@ -2,7 +2,11 @@ package com.example.KOPOCTC_web_project.service;
 
 import com.example.KOPOCTC_web_project.dto.*;
 import com.example.KOPOCTC_web_project.entity.SeoulDataEntity;
+import com.example.KOPOCTC_web_project.entity.ServiceRecommend;
+import com.example.KOPOCTC_web_project.entity.User;
 import com.example.KOPOCTC_web_project.repository.SeoulPublicServiceRepository;
+import com.example.KOPOCTC_web_project.repository.ServiceRecommendRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +26,7 @@ import java.util.Optional;
 public class SeoulPublicService {
 
     private final SeoulPublicServiceRepository repository;
+    private final ServiceRecommendRepository recommendRepository;
 
     // 페이징 및 필터링을 적용한 서비스 목록 조회
     public PageResultDto<ServiceSummaryDto> getServiceList(SearchConditionDto searchCondition) {
@@ -142,6 +147,31 @@ public class SeoulPublicService {
         Page<ServiceSummaryDto> dtoPage = servicePage.map(ServiceSummaryDto::new);
 
         return new PageResultDto<>(dtoPage);
+    }
+
+    @Transactional
+    public int recommendService(Long serviceId, User user) {
+        SeoulDataEntity service = repository.findById(serviceId)
+                .orElseThrow(() -> new IllegalArgumentException("서비스가 존재하지 않습니다."));
+
+        boolean alreadyRecommended = recommendRepository.existsByUserAndService(user, service);
+        if (alreadyRecommended) {
+            throw new IllegalStateException("이미 추천한 게시물입니다.");
+        }
+
+        // 추천 수 증가
+        service.setRecommendCount(service.getRecommendCount() + 1);
+        repository.save(service);
+
+        // 추천 기록 저장
+        ServiceRecommend recommend = ServiceRecommend.builder()
+                .user(user)
+                .service(service)
+                .build();
+        recommendRepository.save(recommend);
+
+        return service.getRecommendCount();
+
     }
 
     // 정렬 조건 생성 헬퍼 메서드
